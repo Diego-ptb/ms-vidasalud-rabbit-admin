@@ -1,0 +1,48 @@
+server:
+  port: 8090
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: ms-vidasalud-rabbit-admin
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USER:admin}
+    password: ${RABBIT_PASS:admin}
+
+vidasalud:
+  # ---------------------------------------------------------------------------
+  # Broker que administra este servicio.
+  #
+  # Son dos puertos distintos y hacen cosas distintas: 5672 es AMQP (declarar y
+  # borrar) y 15672 es la API HTTP de management (consultar lo que existe).
+  # ---------------------------------------------------------------------------
+  broker:
+    management-url: ${RABBIT_MANAGEMENT_URL:http://localhost:15672}
+    username: ${RABBIT_USER:admin}
+    password: ${RABBIT_PASS:admin}
+    vhost: ${RABBIT_VHOST:/}
+
+    # Topologia del sistema. Se puede listar y consultar, pero la API rechaza
+    # borrarla: una llamada equivocada no debe dejar a VidaSalud sin mensajeria.
+    protegidos:
+      - vidasalud.atenciones.topic
+      - vidasalud.comandos.direct
+      - vidasalud.dlx
+      - q.notificaciones.email
+      - q.notificaciones.email.dlq
+      - q.admision.ticket
+      - q.admision.ticket.dlq
+      - q.catalogo.cupo
+      - q.catalogo.cupo.dlq
+
+  internal-key: ${INTERNAL_KEY:vidasalud-internal}
+  internal-key-enabled: ${INTERNAL_KEY_ENABLED:true}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
