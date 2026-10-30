@@ -19,15 +19,16 @@ import org.springframework.web.client.RestClient;
 public class RabbitAdminConfig {
 
     /**
-     * RabbitAdmin sin declaracion automatica al arrancar: este servicio no es
-     * duenio de ninguna cola, solo administra las de los demas. Si se dejara
-     * en automatico crearia topologia que no le corresponde.
+     * RabbitAdmin con declaracion automatica al arrancar.
+     *
+     * Este servicio es el duenio de la topologia: al iniciar crea en el broker
+     * todas las colas, exchanges y bindings declarados en
+     * {@code RabbitTopologyConfig}. Tambien lo usan los endpoints REST para
+     * crear y borrar recursos bajo demanda.
      */
     @Bean
     RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
-        admin.setAutoStartup(false);
-        return admin;
+        return new RabbitAdmin(connectionFactory);
     }
 
     /** Cliente de la API de management, con autenticacion basica. */
